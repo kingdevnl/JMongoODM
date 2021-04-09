@@ -1,11 +1,7 @@
 package nl.kingdev.jmongoorm.utils;
 
-import nl.kingdev.jmongoorm.annotations.Column;
-import nl.kingdev.jmongoorm.annotations.Embed;
 import nl.kingdev.jmongoorm.annotations.Entity;
 import nl.kingdev.jmongoorm.entity.BaseEntity;
-
-import java.lang.reflect.Field;
 
 public class NameUtils {
 

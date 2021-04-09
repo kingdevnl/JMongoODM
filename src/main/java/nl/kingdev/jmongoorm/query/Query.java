@@ -1,9 +1,6 @@
 package nl.kingdev.jmongoorm.query;
 
-import lombok.Getter;
 import org.bson.Document;
-
-import java.util.Queue;
 
 public class Query {
 
@@ -18,7 +15,7 @@ public class Query {
     }
 
     public Query _equals(Object value) {
-        if(queryDocument == null) {
+        if (queryDocument == null) {
             queryDocument = new Document(currentFieldName, value);
             return this;
         } else {
@@ -28,7 +25,7 @@ public class Query {
     }
 
     public Query _greaterThen(Number value) {
-        if(queryDocument == null) {
+        if (queryDocument == null) {
             queryDocument = new Document(currentFieldName, value);
         }
 
@@ -37,8 +34,9 @@ public class Query {
         this.queryDocument.append(currentFieldName, doc);
         return this;
     }
+
     public Query _greaterThenEquals(Number value) {
-        if(queryDocument == null) {
+        if (queryDocument == null) {
             queryDocument = new Document(currentFieldName, value);
         }
 
@@ -47,8 +45,9 @@ public class Query {
         this.queryDocument.append(currentFieldName, doc);
         return this;
     }
+
     public Query _lessThen(Number value) {
-        if(queryDocument == null) {
+        if (queryDocument == null) {
             queryDocument = new Document(currentFieldName, value);
         }
 
@@ -59,7 +58,7 @@ public class Query {
     }
 
     public Query _lessThenEquals(Number value) {
-        if(queryDocument == null) {
+        if (queryDocument == null) {
             queryDocument = new Document(currentFieldName, value);
         }
 
@@ -70,7 +69,7 @@ public class Query {
     }
 
     public Document getQueryDocument() {
-        if(queryDocument == null) {
+        if (queryDocument == null) {
             queryDocument = new Document();
         }
         return queryDocument;

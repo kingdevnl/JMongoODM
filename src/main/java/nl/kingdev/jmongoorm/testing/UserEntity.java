@@ -1,6 +1,6 @@
 package nl.kingdev.jmongoorm.testing;
 
-import lombok.*;
+import lombok.Data;
 import nl.kingdev.jmongoorm.annotations.Column;
 import nl.kingdev.jmongoorm.annotations.Entity;
 import nl.kingdev.jmongoorm.entity.BaseEntity;
