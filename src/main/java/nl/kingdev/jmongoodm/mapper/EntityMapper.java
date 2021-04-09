@@ -9,7 +9,10 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 public class EntityMapper<T extends BaseEntity> {
 
@@ -41,18 +44,25 @@ public class EntityMapper<T extends BaseEntity> {
     }
 
 
-
     private void mapField(Object instance, Field field, Document document) {
 
 
         try {
             //Check if it's a Column and a Basic type.
-            if (field.isAnnotationPresent(Column.class) && isBuiltinType(field.getType())) {
+            if (field.isAnnotationPresent(Column.class)) {
+                field.setAccessible(true);
 
                 //Get the name, Then the value
-                Object value = getValue(document, NameUtils.getColumnName(field));
+                Object value = null;
+
+                if(isBuiltinType(field.getType())) {
+                    value =  getValue(document, NameUtils.getColumnName(field));
+                } else if (Enum.class.isAssignableFrom(field.getType())) {
+                    String enumValue = (String) getValue(document, NameUtils.getColumnName(field));
+                    field.set(instance, Enum.valueOf((Class<? extends Enum>) field.getType(), enumValue));
+                }
+
                 if (value != null) {
-                    field.setAccessible(true);
                     field.set(instance, value);
                 }
             }
@@ -84,6 +94,8 @@ public class EntityMapper<T extends BaseEntity> {
 
                 field.setAccessible(true);
                 nl.kingdev.jmongoodm.annotations.List listInfo = field.getDeclaredAnnotation(nl.kingdev.jmongoodm.annotations.List.class);
+
+                //Get the list
                 List<Object> list = (List<Object>) field.get(instance);
                 if (list == null) {
                     list = new ArrayList<>();
@@ -91,10 +103,14 @@ public class EntityMapper<T extends BaseEntity> {
                     System.out.println("new list");
                 }
 
+                //If it's a simple type, just add them
                 if (isBuiltinType(listInfo.value())) {
-                    list.addAll((Collection<?>) document.get(NameUtils.getColumnName(field)));
-
+                    List<Object> objects = (List<Object>) document.get(NameUtils.getColumnName(field));
+                    if(objects != null) {
+                        list.addAll(objects);
+                    }
                 } else {
+                    //Map the custom type to documents
                     List<Document> documentList = (List<Document>) document.get(NameUtils.getColumnName(field));
                     if (documentList != null) {
                         for (Document doc : documentList) {
@@ -134,8 +150,15 @@ public class EntityMapper<T extends BaseEntity> {
 
     private void saveField(Object instance, Field field, Document document) {
         try {
-            if (field.isAnnotationPresent(Column.class) && isBuiltinType(field.getType())) {
-                Object value = field.get(instance);
+            if (field.isAnnotationPresent(Column.class)) {
+                Object value = null;
+
+                if(isBuiltinType(field.getType()) ) {
+                    value = field.get(instance);
+                } else if(Enum.class.isAssignableFrom(field.getType())) {
+                    value = field.get(instance).toString();
+                }
+
                 if (value != null) {
                     document.append(NameUtils.getColumnName(field), value);
                 }
@@ -152,13 +175,10 @@ public class EntityMapper<T extends BaseEntity> {
                         saveField(embedInstance, embedField, embeddedDocument);
                     }
                 }
-            } else if (field.isAnnotationPresent(nl.kingdev.jmongoodm.annotations.List.class) && field.getType().isAssignableFrom(List.class)) {
+            } else if (field.isAnnotationPresent(nl.kingdev.jmongoodm.annotations.List.class) && List.class.isAssignableFrom(field.getType())) {
                 List<Object> list = (List<Object>) field.get(instance);
                 nl.kingdev.jmongoodm.annotations.List listInfo = field.getDeclaredAnnotation(nl.kingdev.jmongoodm.annotations.List.class);
-
                 if (list != null) {
-
-
                     if (isBuiltinType(listInfo.value())) {
                         document.append(NameUtils.getColumnName(field), list);
                     } else {
