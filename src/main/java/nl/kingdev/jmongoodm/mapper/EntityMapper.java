@@ -48,26 +48,9 @@ public class EntityMapper<T extends BaseEntity> {
 
 
         try {
-            //Check if it's a Column and a Basic type.
-            if (field.isAnnotationPresent(Column.class)) {
-                field.setAccessible(true);
 
-                //Get the name, Then the value
-                Object value = null;
-
-                if(isBuiltinType(field.getType())) {
-                    value =  getValue(document, NameUtils.getColumnName(field));
-                } else if (Enum.class.isAssignableFrom(field.getType())) {
-                    String enumValue = (String) getValue(document, NameUtils.getColumnName(field));
-                    field.set(instance, Enum.valueOf((Class<? extends Enum>) field.getType(), enumValue));
-                }
-
-                if (value != null) {
-                    field.set(instance, value);
-                }
-            }
             //Check if it's a embed
-            else if (field.isAnnotationPresent(Embed.class)) {
+            if (field.isAnnotationPresent(Embed.class)) {
                 String embedName = NameUtils.getEmbedName(field);
                 Document embeddedDocument = (Document) document.get(embedName);
                 if (embeddedDocument != null) {
@@ -106,10 +89,23 @@ public class EntityMapper<T extends BaseEntity> {
                 //If it's a simple type, just add them
                 if (isBuiltinType(listInfo.value())) {
                     List<Object> objects = (List<Object>) document.get(NameUtils.getColumnName(field));
-                    if(objects != null) {
+                    if (objects != null) {
                         list.addAll(objects);
                     }
-                } else {
+                } else if (Enum.class.isAssignableFrom(listInfo.value())) {
+                    List<String> values = (List<String>) document.get(NameUtils.getColumnName(field));
+
+                    List<Object> enums = new ArrayList<>();
+
+                    values.forEach(s -> {
+                        enums.add(Enum.valueOf((Class<? extends Enum>) listInfo.value(), s));
+                    });
+
+
+                    field.set(instance, enums);
+
+                }
+                else {
                     //Map the custom type to documents
                     List<Document> documentList = (List<Document>) document.get(NameUtils.getColumnName(field));
                     if (documentList != null) {
@@ -121,6 +117,24 @@ public class EntityMapper<T extends BaseEntity> {
                             list.add(elementInstance);
                         }
                     }
+                }
+            }
+            //Check if it's a Column and a Basic type.
+            else if (field.isAnnotationPresent(Column.class)) {
+                field.setAccessible(true);
+
+                //Get the name, Then the value
+                Object value = null;
+
+                if (isBuiltinType(field.getType())) {
+                    value = getValue(document, NameUtils.getColumnName(field));
+                } else if (Enum.class.isAssignableFrom(field.getType())) {
+                    String enumValue = (String) getValue(document, NameUtils.getColumnName(field));
+                    field.set(instance, Enum.valueOf((Class<? extends Enum>) field.getType(), enumValue));
+                }
+
+                if (value != null) {
+                    field.set(instance, value);
                 }
             }
 
@@ -149,20 +163,26 @@ public class EntityMapper<T extends BaseEntity> {
 
 
     private void saveField(Object instance, Field field, Document document) {
+
+        boolean canAccess = field.canAccess(instance);
+        if(!canAccess) {
+            field.setAccessible(true);
+        }
         try {
             if (field.isAnnotationPresent(Column.class)) {
                 Object value = null;
 
-                if(isBuiltinType(field.getType()) ) {
+                if (isBuiltinType(field.getType())) {
                     value = field.get(instance);
-                } else if(Enum.class.isAssignableFrom(field.getType())) {
+                } else if (Enum.class.isAssignableFrom(field.getType())) {
                     value = field.get(instance).toString();
                 }
 
                 if (value != null) {
                     document.append(NameUtils.getColumnName(field), value);
                 }
-            } else if (field.isAnnotationPresent(Embed.class)) {
+            }
+            if (field.isAnnotationPresent(Embed.class)) {
                 String embedName = NameUtils.getEmbedName(field);
                 Object embedInstance = field.get(instance);
                 Document embeddedDocument = (Document) document.get(embedName);
@@ -176,11 +196,18 @@ public class EntityMapper<T extends BaseEntity> {
                     }
                 }
             } else if (field.isAnnotationPresent(nl.kingdev.jmongoodm.annotations.List.class) && List.class.isAssignableFrom(field.getType())) {
+
                 List<Object> list = (List<Object>) field.get(instance);
                 nl.kingdev.jmongoodm.annotations.List listInfo = field.getDeclaredAnnotation(nl.kingdev.jmongoodm.annotations.List.class);
                 if (list != null) {
                     if (isBuiltinType(listInfo.value())) {
                         document.append(NameUtils.getColumnName(field), list);
+                    } else if (Enum.class.isAssignableFrom(listInfo.value())) {
+                        List<String> values = new ArrayList<>();
+                        for (Object e : list) {
+                            values.add(e.toString());
+                        }
+                        document.append(NameUtils.getColumnName(field), values);
                     } else {
                         List<Document> documents = new ArrayList<>();
                         for (Object element : list) {
@@ -202,6 +229,7 @@ public class EntityMapper<T extends BaseEntity> {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        field.setAccessible(canAccess);
     }
 
     public Document mapToDocument(T entity) {
