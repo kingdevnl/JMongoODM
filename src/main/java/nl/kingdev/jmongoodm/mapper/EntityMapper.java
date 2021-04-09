@@ -9,13 +9,12 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class EntityMapper<T extends BaseEntity> {
 
+    private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
     private Document rootDocument;
     private Class<? extends BaseEntity> clzz;
 
@@ -26,7 +25,7 @@ public class EntityMapper<T extends BaseEntity> {
 
     private boolean isBuiltinType(Class<?> type) {
         return type == String.class || type == boolean.class || type == byte.class || type == char.class || type == short.class
-                || type == int.class || type == long.class || type == float.class || type == double.class || type == Date.class;
+                || type == int.class || type == long.class || type == float.class || type == double.class;
     }
 
     private Object getValue(Document document, String name) {
@@ -83,7 +82,6 @@ public class EntityMapper<T extends BaseEntity> {
                 if (list == null) {
                     list = new ArrayList<>();
                     field.set(instance, list);
-                    System.out.println("new list");
                 }
 
                 //If it's a simple type, just add them
@@ -104,8 +102,7 @@ public class EntityMapper<T extends BaseEntity> {
 
                     field.set(instance, enums);
 
-                }
-                else {
+                } else {
                     //Map the custom type to documents
                     List<Document> documentList = (List<Document>) document.get(NameUtils.getColumnName(field));
                     if (documentList != null) {
@@ -126,8 +123,13 @@ public class EntityMapper<T extends BaseEntity> {
                 //Get the name, Then the value
                 Object value = null;
 
+
                 if (isBuiltinType(field.getType())) {
                     value = getValue(document, NameUtils.getColumnName(field));
+                } else if (UUID.class.isAssignableFrom(field.getType())) {
+                    field.set(instance, UUID.fromString((String) getValue(document, NameUtils.getColumnName(field))));
+                } else if (Date.class.isAssignableFrom(field.getType())) {
+                    field.set(instance, simpleDateFormat.parse((String) getValue(document, NameUtils.getColumnName(field))));
                 } else if (Enum.class.isAssignableFrom(field.getType())) {
                     String enumValue = (String) getValue(document, NameUtils.getColumnName(field));
                     field.set(instance, Enum.valueOf((Class<? extends Enum>) field.getType(), enumValue));
@@ -165,7 +167,7 @@ public class EntityMapper<T extends BaseEntity> {
     private void saveField(Object instance, Field field, Document document) {
 
         boolean canAccess = field.canAccess(instance);
-        if(!canAccess) {
+        if (!canAccess) {
             field.setAccessible(true);
         }
         try {
@@ -176,10 +178,14 @@ public class EntityMapper<T extends BaseEntity> {
                     value = field.get(instance);
                 } else if (Enum.class.isAssignableFrom(field.getType())) {
                     value = field.get(instance).toString();
+                } else if (UUID.class.isAssignableFrom(field.getType())) {
+                    value = field.get(instance).toString();
+                } else if (Date.class.isAssignableFrom(field.getType())) {
+                    value = simpleDateFormat.format((Date) field.get(instance));
                 }
 
                 if (value != null) {
-                    document.append(NameUtils.getColumnName(field), value);
+                    document.append(NameUtils.getColumnName(field), value.toString());
                 }
             }
             if (field.isAnnotationPresent(Embed.class)) {
