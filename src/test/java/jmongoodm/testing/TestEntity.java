@@ -1,13 +1,14 @@
-package nl.kingdev.jmongoorm.testing;
+package jmongoodm.testing;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import nl.kingdev.jmongoorm.annotations.Column;
-import nl.kingdev.jmongoorm.annotations.Embed;
-import nl.kingdev.jmongoorm.annotations.Entity;
-import nl.kingdev.jmongoorm.entity.BaseEntity;
+import nl.kingdev.jmongoodm.annotations.Column;
+import nl.kingdev.jmongoodm.annotations.Embed;
+import nl.kingdev.jmongoodm.annotations.Entity;
+import nl.kingdev.jmongoodm.entity.BaseEntity;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -27,7 +28,7 @@ public class TestEntity extends BaseEntity {
     public Date someDate;
 
     @Column()
-    @nl.kingdev.jmongoorm.annotations.List(Message.class)
+    @nl.kingdev.jmongoodm.annotations.List(Message.class)
     public List<Message> messages = new ArrayList<>();
 
     @AllArgsConstructor

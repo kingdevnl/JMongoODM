@@ -1,10 +1,10 @@
-package nl.kingdev.jmongoorm;
+package nl.kingdev.jmongoodm;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import lombok.Getter;
 
-public class JMongoORM {
+public class JMongoODM {
 
 
     @Getter
@@ -15,7 +15,7 @@ public class JMongoORM {
 
     public static void init(MongoClient client, String dbName) {
         mongoClient = client;
-        JMongoORM.database = client.getDatabase(dbName);
+        JMongoODM.database = client.getDatabase(dbName);
     }
 
 

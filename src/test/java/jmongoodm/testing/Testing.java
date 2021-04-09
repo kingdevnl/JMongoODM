@@ -1,15 +1,15 @@
-package nl.kingdev.jmongoorm.testing;
+package jmongoodm.testing;
 
 import com.mongodb.client.MongoClients;
-import nl.kingdev.jmongoorm.JMongoORM;
-import nl.kingdev.jmongoorm.query.Query;
+import nl.kingdev.jmongoodm.JMongoODM;
+import nl.kingdev.jmongoodm.query.Query;
 
 
 public class Testing {
 
 
     public static void main(String[] args) {
-        JMongoORM.init(MongoClients.create("mongodb://localhost:27017"), "testing");
+        JMongoODM.init(MongoClients.create("mongodb://localhost:27017"), "testing");
 
 
         TestEntity testEntity = TestEntity.findOne(new Query(), TestEntity.class);
@@ -18,6 +18,6 @@ public class Testing {
 
 
 
-        JMongoORM.close();
+        JMongoODM.close();
     }
 }

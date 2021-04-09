@@ -1,7 +1,8 @@
-package nl.kingdev.jmongoorm.testing;
+package jmongoodm.testing;
+
 
 import lombok.ToString;
-import nl.kingdev.jmongoorm.annotations.Column;
+import nl.kingdev.jmongoodm.annotations.Column;
 
 @ToString
 public class Author {

@@ -1,4 +1,4 @@
-package nl.kingdev.jmongoorm.query;
+package nl.kingdev.jmongoodm.query;
 
 import org.bson.Document;
 

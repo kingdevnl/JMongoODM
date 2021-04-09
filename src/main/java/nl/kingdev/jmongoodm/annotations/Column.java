@@ -1,4 +1,4 @@
-package nl.kingdev.jmongoorm.annotations;
+package nl.kingdev.jmongoodm.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -7,6 +7,6 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface ObjectID {
-
+public @interface Column {
+    String value() default "";
 }

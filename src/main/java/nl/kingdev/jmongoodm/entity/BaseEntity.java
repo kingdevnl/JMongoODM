@@ -1,11 +1,12 @@
-package nl.kingdev.jmongoorm.entity;
+package nl.kingdev.jmongoodm.entity;
 
 import com.mongodb.client.MongoCollection;
-import nl.kingdev.jmongoorm.JMongoORM;
-import nl.kingdev.jmongoorm.annotations.ObjectID;
-import nl.kingdev.jmongoorm.mapper.EntityMapper;
-import nl.kingdev.jmongoorm.query.Query;
-import nl.kingdev.jmongoorm.utils.NameUtils;
+
+import nl.kingdev.jmongoodm.JMongoODM;
+import nl.kingdev.jmongoodm.annotations.ObjectID;
+import nl.kingdev.jmongoodm.mapper.EntityMapper;
+import nl.kingdev.jmongoodm.query.Query;
+import nl.kingdev.jmongoodm.utils.NameUtils;
 import org.bson.BsonObjectId;
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -27,7 +28,7 @@ public class BaseEntity {
 
     public static <T extends BaseEntity> T findOne(Query query, Class<? extends BaseEntity> type) {
         String collectionName = NameUtils.getEntityCollectionName(type);
-        MongoCollection<Document> collection = JMongoORM.getDatabase().getCollection(collectionName);
+        MongoCollection<Document> collection = JMongoODM.getDatabase().getCollection(collectionName);
         Document first = collection.find(query.getQueryDocument()).first();
 
         if (first != null) {
@@ -43,7 +44,7 @@ public class BaseEntity {
         List<T> entities = new ArrayList<>();
 
         String collectionName = NameUtils.getEntityCollectionName(type);
-        MongoCollection<Document> collection = JMongoORM.getDatabase().getCollection(collectionName);
+        MongoCollection<Document> collection = JMongoODM.getDatabase().getCollection(collectionName);
 
         for (Document document : collection.find(query.getQueryDocument())) {
 
@@ -60,7 +61,7 @@ public class BaseEntity {
 
     public <T extends BaseEntity> T save(Class<? extends BaseEntity> type) {
         String collectionName = NameUtils.getEntityCollectionName(type);
-        MongoCollection<Document> collection = JMongoORM.getDatabase().getCollection(collectionName);
+        MongoCollection<Document> collection = JMongoODM.getDatabase().getCollection(collectionName);
 
         EntityMapper<T> mapper = new EntityMapper<>(new Document(), type);
 

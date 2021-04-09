@@ -1,8 +1,8 @@
-package nl.kingdev.jmongoorm.testing;
+package jmongoodm.testing;
 
 import lombok.ToString;
-import nl.kingdev.jmongoorm.annotations.Column;
-import nl.kingdev.jmongoorm.annotations.Embed;
+import nl.kingdev.jmongoodm.annotations.Column;
+import nl.kingdev.jmongoodm.annotations.Embed;
 
 @ToString
 public class Book {

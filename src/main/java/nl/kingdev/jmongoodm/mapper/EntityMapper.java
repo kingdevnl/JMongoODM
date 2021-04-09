@@ -1,9 +1,10 @@
-package nl.kingdev.jmongoorm.mapper;
+package nl.kingdev.jmongoodm.mapper;
 
-import nl.kingdev.jmongoorm.annotations.Column;
-import nl.kingdev.jmongoorm.annotations.Embed;
-import nl.kingdev.jmongoorm.annotations.ObjectID;
-import nl.kingdev.jmongoorm.entity.BaseEntity;
+import nl.kingdev.jmongoodm.annotations.Column;
+import nl.kingdev.jmongoodm.annotations.Embed;
+import nl.kingdev.jmongoodm.annotations.ObjectID;
+import nl.kingdev.jmongoodm.entity.BaseEntity;
+import nl.kingdev.jmongoodm.utils.NameUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
@@ -39,26 +40,7 @@ public class EntityMapper<T extends BaseEntity> {
         return document.get(name);
     }
 
-    private String getColumnName(Field field) {
 
-        Column column = field.getDeclaredAnnotation(Column.class);
-
-        if (!column.value().equals("")) {
-            return column.value();
-        }
-
-        return field.getName();
-    }
-
-    public String getEmbedName(Field field) {
-        Embed embed = field.getDeclaredAnnotation(Embed.class);
-
-        if (!embed.value().equals("")) {
-            return embed.value();
-        }
-
-        return field.getName();
-    }
 
     private void mapField(Object instance, Field field, Document document) {
 
@@ -68,7 +50,7 @@ public class EntityMapper<T extends BaseEntity> {
             if (field.isAnnotationPresent(Column.class) && isBuiltinType(field.getType())) {
 
                 //Get the name, Then the value
-                Object value = getValue(document, getColumnName(field));
+                Object value = getValue(document, NameUtils.getColumnName(field));
                 if (value != null) {
                     field.setAccessible(true);
                     field.set(instance, value);
@@ -76,7 +58,7 @@ public class EntityMapper<T extends BaseEntity> {
             }
             //Check if it's a embed
             else if (field.isAnnotationPresent(Embed.class)) {
-                String embedName = getEmbedName(field);
+                String embedName = NameUtils.getEmbedName(field);
                 Document embeddedDocument = (Document) document.get(embedName);
                 if (embeddedDocument != null) {
                     field.setAccessible(true);
@@ -98,10 +80,10 @@ public class EntityMapper<T extends BaseEntity> {
                 ObjectId objectId = (ObjectId) rootDocument.get("_id");
                 field.setAccessible(true);
                 field.set(instance, objectId);
-            } else if (field.isAnnotationPresent(nl.kingdev.jmongoorm.annotations.List.class) && field.isAnnotationPresent(Column.class)) {
+            } else if (field.isAnnotationPresent(nl.kingdev.jmongoodm.annotations.List.class) && field.isAnnotationPresent(Column.class)) {
 
                 field.setAccessible(true);
-                nl.kingdev.jmongoorm.annotations.List listInfo = field.getDeclaredAnnotation(nl.kingdev.jmongoorm.annotations.List.class);
+                nl.kingdev.jmongoodm.annotations.List listInfo = field.getDeclaredAnnotation(nl.kingdev.jmongoodm.annotations.List.class);
                 List<Object> list = (List<Object>) field.get(instance);
                 if (list == null) {
                     list = new ArrayList<>();
@@ -110,10 +92,10 @@ public class EntityMapper<T extends BaseEntity> {
                 }
 
                 if (isBuiltinType(listInfo.value())) {
-                    list.addAll((Collection<?>) document.get(getColumnName(field)));
+                    list.addAll((Collection<?>) document.get(NameUtils.getColumnName(field)));
 
                 } else {
-                    List<Document> documentList = (List<Document>) document.get(getColumnName(field));
+                    List<Document> documentList = (List<Document>) document.get(NameUtils.getColumnName(field));
                     if (documentList != null) {
                         for (Document doc : documentList) {
                             Object elementInstance = listInfo.value().getDeclaredConstructor().newInstance();
@@ -155,10 +137,10 @@ public class EntityMapper<T extends BaseEntity> {
             if (field.isAnnotationPresent(Column.class) && isBuiltinType(field.getType())) {
                 Object value = field.get(instance);
                 if (value != null) {
-                    document.append(getColumnName(field), value);
+                    document.append(NameUtils.getColumnName(field), value);
                 }
             } else if (field.isAnnotationPresent(Embed.class)) {
-                String embedName = getEmbedName(field);
+                String embedName = NameUtils.getEmbedName(field);
                 Object embedInstance = field.get(instance);
                 Document embeddedDocument = (Document) document.get(embedName);
                 if (embeddedDocument == null) {
@@ -170,15 +152,15 @@ public class EntityMapper<T extends BaseEntity> {
                         saveField(embedInstance, embedField, embeddedDocument);
                     }
                 }
-            } else if (field.isAnnotationPresent(nl.kingdev.jmongoorm.annotations.List.class) && field.getType().isAssignableFrom(List.class)) {
+            } else if (field.isAnnotationPresent(nl.kingdev.jmongoodm.annotations.List.class) && field.getType().isAssignableFrom(List.class)) {
                 List<Object> list = (List<Object>) field.get(instance);
-                nl.kingdev.jmongoorm.annotations.List listInfo = field.getDeclaredAnnotation(nl.kingdev.jmongoorm.annotations.List.class);
+                nl.kingdev.jmongoodm.annotations.List listInfo = field.getDeclaredAnnotation(nl.kingdev.jmongoodm.annotations.List.class);
 
                 if (list != null) {
 
 
                     if (isBuiltinType(listInfo.value())) {
-                        document.append(getColumnName(field), list);
+                        document.append(NameUtils.getColumnName(field), list);
                     } else {
                         List<Document> documents = new ArrayList<>();
                         for (Object element : list) {
@@ -188,11 +170,11 @@ public class EntityMapper<T extends BaseEntity> {
                             }
                             documents.add(doc);
                         }
-                        rootDocument.append(getColumnName(field), documents);
+                        rootDocument.append(NameUtils.getColumnName(field), documents);
 
                     }
                 } else {
-                    document.put(getColumnName(field), null);
+                    document.put(NameUtils.getColumnName(field), null);
                 }
 
             }
