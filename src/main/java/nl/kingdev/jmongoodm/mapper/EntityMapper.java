@@ -10,7 +10,9 @@ import nl.kingdev.jmongoodm.utils.NameUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -62,7 +64,7 @@ public class EntityMapper<T extends BaseEntity> {
                     Object embedInstance = field.get(instance);
 
                     if (embedInstance == null) {
-                        embedInstance = embedType.getDeclaredConstructor().newInstance();
+                        embedInstance = newInstance(embedType);
                         field.set(instance, embedInstance);
                     }
 
@@ -109,7 +111,7 @@ public class EntityMapper<T extends BaseEntity> {
                     List<Document> documentList = (List<Document>) document.get(NameUtils.getColumnName(field));
                     if (documentList != null) {
                         for (Document doc : documentList) {
-                            Object elementInstance = listInfo.value().getDeclaredConstructor().newInstance();
+                            Object elementInstance = newInstance(listInfo.value());
                             for (Field elementField : listInfo.value().getDeclaredFields()) {
                                 mapField(elementInstance, elementField, doc);
                             }
@@ -171,7 +173,7 @@ public class EntityMapper<T extends BaseEntity> {
     public T mapToEntity() {
 
         try {
-            T entity = (T) clzz.getDeclaredConstructor().newInstance();
+            T entity = (T) newInstance(clzz);
             List<Field> fields = new ArrayList<>();
             fields.addAll(Arrays.asList(entity.getClass().getSuperclass().getDeclaredFields()));
             fields.addAll(Arrays.asList(entity.getClass().getDeclaredFields()));
@@ -282,5 +284,20 @@ public class EntityMapper<T extends BaseEntity> {
         fields.forEach(field -> saveField(entity, field, rootDocument));
 
         return rootDocument;
+    }
+
+    private Object newInstance(Class<?> m) throws Exception {
+        Constructor<?> c = m.getDeclaredConstructor();
+
+        boolean canAccess = !Modifier.isPrivate(c.getModifiers());
+
+        if(!canAccess) {
+            c.setAccessible(true);
+        }
+        Object instance = c.newInstance();
+
+        c.setAccessible(canAccess);
+
+        return instance;
     }
 }

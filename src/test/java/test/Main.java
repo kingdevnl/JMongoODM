@@ -141,7 +141,7 @@ public class Main {
         public ArrayList<Warn> warns = new ArrayList<>();
 
         //For internal use
-        public User() {
+        private User() {
         }
 
 

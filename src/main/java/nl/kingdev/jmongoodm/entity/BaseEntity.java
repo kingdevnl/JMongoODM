@@ -77,8 +77,8 @@ public abstract class BaseEntity {
      * @param <T>   Generic type
      * @return How many where deleted
      */
-    public static <T extends BaseEntity> long deleteOne(Query query, T type) {
-        return JMongoODM.getDatabase().getCollection(NameUtils.getEntityCollectionName(type.getClass()))
+    public static <T extends BaseEntity> long deleteOne(Query query, Class<T> type) {
+        return JMongoODM.getDatabase().getCollection(NameUtils.getEntityCollectionName(type))
                 .deleteOne((query.getQueryDocument())).getDeletedCount();
     }
 
@@ -90,8 +90,8 @@ public abstract class BaseEntity {
      * @param <T>   Generic type
      * @return How many where deleted
      */
-    public static <T extends BaseEntity> long delete(Query query, T type) {
-        return JMongoODM.getDatabase().getCollection(NameUtils.getEntityCollectionName(type.getClass()))
+    public static <T extends BaseEntity> long delete(Query query, Class<T> type) {
+        return JMongoODM.getDatabase().getCollection(NameUtils.getEntityCollectionName(type))
                 .deleteMany((query.getQueryDocument())).getDeletedCount();
     }
 
