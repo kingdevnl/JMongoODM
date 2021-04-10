@@ -3,7 +3,9 @@ package nl.kingdev.jmongoodm.mapper;
 import nl.kingdev.jmongoodm.annotations.Column;
 import nl.kingdev.jmongoodm.annotations.Embed;
 import nl.kingdev.jmongoodm.annotations.ObjectID;
+import nl.kingdev.jmongoodm.annotations.Reference;
 import nl.kingdev.jmongoodm.entity.BaseEntity;
+import nl.kingdev.jmongoodm.query.Query;
 import nl.kingdev.jmongoodm.utils.NameUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -115,6 +117,26 @@ public class EntityMapper<T extends BaseEntity> {
                         }
                     }
                 }
+            } else if (field.isAnnotationPresent(Reference.class)) {
+                Reference referenceInfo = field.getDeclaredAnnotation(Reference.class);
+                if (field.getType().isAssignableFrom(BaseEntity.class)) {
+                    ObjectId id = (ObjectId) getValue(document, NameUtils.getColumnName(field));
+                    BaseEntity entity = BaseEntity.findOne(new Query().field("_id")._equals(id), referenceInfo.value());
+                    if (entity != null) {
+                        field.set(instance, entity);
+                    }
+                } else if (List.class.isAssignableFrom(field.getType())) {
+
+                    List<Object> list = (List<Object>) field.get(instance);
+                    if (list == null) {
+                        list = new ArrayList<>();
+                        field.set(instance, list);
+                    }
+                    List<ObjectId> ids = (List<ObjectId>) document.get(NameUtils.getColumnName(field));
+                    for (ObjectId id : ids) {
+                        list.add(BaseEntity.find(new Query().field("_id")._equals(id), referenceInfo.value()));
+                    }
+                }
             }
             //Check if it's a Column and a Basic type.
             else if (field.isAnnotationPresent(Column.class)) {
@@ -185,7 +207,7 @@ public class EntityMapper<T extends BaseEntity> {
                 }
 
                 if (value != null) {
-                    document.append(NameUtils.getColumnName(field), value.toString());
+                    document.append(NameUtils.getColumnName(field), value);
                 }
             }
             if (field.isAnnotationPresent(Embed.class)) {
@@ -228,6 +250,20 @@ public class EntityMapper<T extends BaseEntity> {
                     }
                 } else {
                     document.put(NameUtils.getColumnName(field), null);
+                }
+
+            } else if (field.isAnnotationPresent(Reference.class)) {
+
+                if (BaseEntity.class.isAssignableFrom(field.getType())) {
+                    Object value = field.get(instance);
+                    if (value instanceof BaseEntity) {
+                        document.append(NameUtils.getColumnName(field), ((BaseEntity) value).objectID);
+                    }
+                } else if (List.class.isAssignableFrom(field.getType())) {
+                    List<BaseEntity> entities = (List<BaseEntity>) field.get(instance);
+                    List<ObjectId> ids = new ArrayList<>();
+                    entities.forEach(e -> ids.add(e.objectID));
+                    document.append(NameUtils.getColumnName(field), ids);
                 }
 
             }

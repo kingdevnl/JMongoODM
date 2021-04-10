@@ -18,7 +18,7 @@ public class NameUtils {
 
         if (entityInfo == null) {
             System.out.printf("Entity class %s is missing the @Entity annotation!", clzz.getName());
-            return null;
+            throw new RuntimeException("Invalid entity class, Missing @Entity annotation");
         }
 
         if (!entityInfo.value().equals("")) {
