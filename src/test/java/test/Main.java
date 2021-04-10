@@ -131,6 +131,7 @@ public class Main {
         public ArrayList<Action> actions = new ArrayList<>();
 
 
+        @Column
         @Embed
         public Book favBook;
 
