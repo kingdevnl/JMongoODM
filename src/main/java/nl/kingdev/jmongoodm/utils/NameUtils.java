@@ -1,7 +1,6 @@
 package nl.kingdev.jmongoodm.utils;
 
 import nl.kingdev.jmongoodm.annotations.Column;
-import nl.kingdev.jmongoodm.annotations.Embed;
 import nl.kingdev.jmongoodm.annotations.Entity;
 import nl.kingdev.jmongoodm.entity.BaseEntity;
 
@@ -35,16 +34,6 @@ public class NameUtils {
 
         if (!column.value().equals("")) {
             return column.value();
-        }
-
-        return field.getName();
-    }
-
-    public static String getEmbedName(Field field) {
-        Embed embed = field.getDeclaredAnnotation(Embed.class);
-
-        if (!embed.value().equals("")) {
-            return embed.value();
         }
 
         return field.getName();

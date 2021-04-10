@@ -52,7 +52,7 @@ public class EntityMapper<T extends BaseEntity> {
 
             //Check if it's a embed
             if (field.isAnnotationPresent(Embed.class)) {
-                String embedName = NameUtils.getEmbedName(field);
+                String embedName = NameUtils.getColumnName(field);
                 Document embeddedDocument = (Document) document.get(embedName);
                 if (embeddedDocument != null) {
                     field.setAccessible(true);
@@ -211,7 +211,7 @@ public class EntityMapper<T extends BaseEntity> {
                 }
             }
             if (field.isAnnotationPresent(Embed.class)) {
-                String embedName = NameUtils.getEmbedName(field);
+                String embedName = NameUtils.getColumnName(field);
                 Object embedInstance = field.get(instance);
                 Document embeddedDocument = (Document) document.get(embedName);
                 if (embeddedDocument == null) {
