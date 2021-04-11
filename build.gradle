@@ -2,6 +2,8 @@ plugins {
     id 'java'
     id "io.freefair.lombok" version "5.3.3.3"
     id "maven-publish"
+    id 'org.cadixdev.licenser' version '0.5.1'
+
 }
 
 group 'nl.kingdev'
@@ -34,4 +36,8 @@ repositories {
 
 dependencies {
     compile 'org.mongodb:mongodb-driver-sync:4.2.2'
+}
+
+license {
+    header = project.file('LICENSE')
 }

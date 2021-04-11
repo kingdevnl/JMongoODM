@@ -1,6 +1,31 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2021 kingdevnl
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package nl.kingdev.jmongoodm.entity;
 
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.CountOptions;
 import nl.kingdev.jmongoodm.JMongoODM;
 import nl.kingdev.jmongoodm.annotations.ObjectID;
 import nl.kingdev.jmongoodm.mapper.EntityMapper;
@@ -95,16 +120,25 @@ public abstract class BaseEntity {
                 .deleteMany((query.getQueryDocument())).getDeletedCount();
     }
 
+    public static <T extends BaseEntity> Object count(Query query, CountOptions options, Class<T> type) {
+        return JMongoODM.getDatabase().getCollection(NameUtils.getEntityCollectionName(type))
+                .countDocuments(query.getQueryDocument(), options);
+    }
+
     /**
      * Delete one entity
      *
-     * @param entity  Type of the entity (Class)
-     * @param <T>   Generic type
+     * @param entity Type of the entity (Class)
+     * @param <T>    Generic type
      * @return How many where deleted
      */
     public static <T extends BaseEntity> long deleteOne(T entity) {
         return JMongoODM.getDatabase().getCollection(NameUtils.getEntityCollectionName(entity.getClass()))
                 .deleteOne(new Document("_id", entity.objectID)).getDeletedCount();
+    }
+
+    public void delete() {
+        delete(new Query().field("_id")._equals(objectID), getClass());
     }
 
     /**
@@ -156,6 +190,8 @@ public abstract class BaseEntity {
     public int hashCode() {
         return Objects.hash(objectID);
     }
+
+
 }
 
 
