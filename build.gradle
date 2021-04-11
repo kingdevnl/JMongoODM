@@ -3,6 +3,7 @@ plugins {
     id "io.freefair.lombok" version "5.3.3.3"
     id "maven-publish"
     id 'org.cadixdev.licenser' version '0.5.1'
+    id("org.nosphere.gradle.github.actions") version "1.2.0"
 
 }
 
@@ -16,8 +17,8 @@ publishing {
             name = "GitHubPackages"
             url = uri("https://maven.pkg.github.com/kingdevnl/jmongoodm")
             credentials {
-                username = System.getenv("GHUSER")
-                password = System.getenv("GHTOKEN")
+                username = githubActions.running.get() ? System.getenv("GITHUB_ACTOR") : System.getenv("GHUSER")
+                password = githubActions.running.get() ? System.getenv("GITHUB_TOKEN") : System.getenv("GHTOKEN")
             }
         }
         mavenLocal()
