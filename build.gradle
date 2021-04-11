@@ -15,6 +15,7 @@ if(githubActions.running.get()) {
     version mVersion
 }
 
+print("Version: ${version}")
 
 publishing {
     repositories {
