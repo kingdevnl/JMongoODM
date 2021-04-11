@@ -56,6 +56,11 @@ public class NameUtils {
 
         Column column = field.getDeclaredAnnotation(Column.class);
 
+        if(column == null) {
+            System.err.println("Field "+field.getName() + " Is missing the @Column annotation!");
+            throw new RuntimeException("Invalid entity field, Missing @Column annotation");
+        }
+
         if (!column.value().equals("")) {
             return column.value();
         }

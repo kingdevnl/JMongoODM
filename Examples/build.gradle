@@ -1,0 +1,18 @@
+plugins {
+    id 'java'
+}
+
+group 'nl.kingdev'
+version '1.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+   compile project(":")
+}
+
+test {
+    useJUnitPlatform()
+}
