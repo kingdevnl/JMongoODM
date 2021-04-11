@@ -55,6 +55,8 @@ public class CreateUserTest extends BaseTest {
         assertEquals("James", user.username);
         assertEquals(21, user.age);
 
+        System.out.println("Create user test passed! "+user);
+
     }
 
 
