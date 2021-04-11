@@ -4,15 +4,17 @@ plugins {
     id "maven-publish"
     id 'org.cadixdev.licenser' version '0.5.1'
     id("org.nosphere.gradle.github.actions") version "1.2.0"
-
+    id "net.nemerosa.versioning" version "2.14.0"
 }
 
 group 'nl.kingdev'
 
 def mVersion = "1.1-SNAPSHOT"
 
-if(!githubActions.running.get()) {
+if (!githubActions.running.get()) {
     version mVersion
+} else {
+    version versioning.info.build+"-SNAPSHOT"
 }
 
 print("Version: ${version}")
