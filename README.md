@@ -1,6 +1,8 @@
 #JMongoODM
 Simple MongoDB ODM for Java!
 
+[![Gradle](https://github.com/kingdevnl/JMongoODM/actions/workflows/gradle.yaml/badge.svg)](https://github.com/kingdevnl/JMongoODM/actions/workflows/gradle.yaml)
+
 For all examples check Examples/src/main/java/examples
 
 Simple example use:
