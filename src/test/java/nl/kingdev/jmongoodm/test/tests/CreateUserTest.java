@@ -31,6 +31,8 @@ import nl.kingdev.jmongoodm.test.entities.UserEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.logging.Logger;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -54,7 +56,6 @@ public class CreateUserTest extends BaseTest {
         assertNotNull(user);
         assertEquals("James", user.username);
         assertEquals(21, user.age);
-
     }
 
 
