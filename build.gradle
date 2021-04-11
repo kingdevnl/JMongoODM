@@ -11,7 +11,7 @@ group 'nl.kingdev'
 
 def mVersion = "1.1-SNAPSHOT"
 
-if(githubActions.running.get()) {
+if(!githubActions.running.get()) {
     version mVersion
 }
 
