@@ -61,3 +61,7 @@ test {
 tasks.getByName("build") {
     it.dependsOn test
 }
+
+tasks.register("beforeCommit") {
+   dependsOn tasks.updateLicenses, tasks.build, tasks.test
+}
