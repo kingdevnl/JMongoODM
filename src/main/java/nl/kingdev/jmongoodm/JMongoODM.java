@@ -26,7 +26,17 @@ package nl.kingdev.jmongoodm;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
+import lombok.Data;
 import lombok.Getter;
+import nl.kingdev.jmongoodm.mapping.MappingRegistry;
+import nl.kingdev.jmongoodm.mapping.impl.DateMapper;
+import nl.kingdev.jmongoodm.mapping.impl.EnumMapper;
+import nl.kingdev.jmongoodm.mapping.impl.ObjectIdMapper;
+import nl.kingdev.jmongoodm.mapping.impl.UUIDMapper;
+import org.bson.types.ObjectId;
+
+import java.util.Date;
+import java.util.UUID;
 
 public class JMongoODM {
 
@@ -37,9 +47,19 @@ public class JMongoODM {
     private static MongoDatabase database;
 
 
+    @Getter
+    private static MappingRegistry mappingRegistry;
+
+
     public static void init(MongoClient client, String dbName) {
         mongoClient = client;
         JMongoODM.database = client.getDatabase(dbName);
+        mappingRegistry = new MappingRegistry();
+
+        mappingRegistry.registerMapper(ObjectId.class, new ObjectIdMapper());
+        mappingRegistry.registerMapper(UUID.class, new UUIDMapper());
+        mappingRegistry.registerMapper(Enum.class, new EnumMapper());
+        mappingRegistry.registerMapper(Date.class, new DateMapper());
     }
 
 

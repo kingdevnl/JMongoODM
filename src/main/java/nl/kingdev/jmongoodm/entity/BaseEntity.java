@@ -27,6 +27,7 @@ package nl.kingdev.jmongoodm.entity;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.CountOptions;
 import nl.kingdev.jmongoodm.JMongoODM;
+import nl.kingdev.jmongoodm.annotations.Column;
 import nl.kingdev.jmongoodm.annotations.ObjectID;
 import nl.kingdev.jmongoodm.mapper.EntityMapper;
 import nl.kingdev.jmongoodm.query.Query;
@@ -43,6 +44,7 @@ import java.util.Objects;
 public abstract class BaseEntity {
 
 
+    @Column("_id")
     @ObjectID()
     public ObjectId objectID;
 
